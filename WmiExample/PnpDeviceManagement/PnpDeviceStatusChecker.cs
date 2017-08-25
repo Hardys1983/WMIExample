@@ -13,7 +13,7 @@ namespace PnpDeviceManagement
 
         public CancellationTokenSource CancellationToken { get; }
 
-        private uint _delayTime;
+        private readonly uint _delayTime;
 
         private class QueryDeviceStatus
         {
@@ -57,7 +57,7 @@ namespace PnpDeviceManagement
         private void CheckParameters(IEnumerable<string> descriptions, uint delayTime)
         {
             var descriptionError = string.Empty;
-            string delayError = string.Empty;
+            var delayError = string.Empty;
 
             if (!descriptions.Any())
             {
@@ -79,13 +79,13 @@ namespace PnpDeviceManagement
         {
             var ct = CancellationToken.Token;
 
-            var task = Task.Factory.StartNew(async() =>
+            Task.Factory.StartNew(async() =>
             {
                 ct.ThrowIfCancellationRequested();
 
                 while (true)
                 {
-                    await Task.Delay(TimeSpan.FromMilliseconds(_delayTime));
+                    await Task.Delay(TimeSpan.FromMilliseconds(_delayTime), ct);
 
                     var deviceStatus = GetDeviceStatus();
                     foreach (var device in _queries)
